@@ -1,12 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:nba_api/buscar_partida.dart';
+import 'package:nba_api/classes/jogos.dart';
+import 'package:nba_api/jogos_controller.dart';
+
+int id = 299;
 
 void main() {
   runApp(NBA_API());
 }
 
-class NBA_API extends StatelessWidget {
+class NBA_API extends StatefulWidget {
+  @override
+  _NBA_APIState createState() => _NBA_APIState();
+}
+
+class _NBA_APIState extends State<NBA_API> {
+  TextEditingController txtPartida = new TextEditingController();
+  AsyncSnapshot teste;
+  Future<Jogos> partida;
+
+  @override
+  void initState() {
+    super.initState();
+    partida = BuscarDados(id);
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -16,15 +35,46 @@ class NBA_API extends StatelessWidget {
         body: SingleChildScrollView(
           child: ConstrainedBox(
             constraints: BoxConstraints(),
-            child: BuscarPartida(),
+            child: FutureBuilder<Jogos>(
+              future: partida,
+              builder: (context, snapshot) {
+                teste = snapshot;
+                if (snapshot.hasData) {
+                  return BuscarPartida(idPartida: teste.data.id);
+                } else if (snapshot.hasError) {
+                  return Text("${snapshot.error}");
+                }
+                return CircularProgressIndicator();
+              },
+            ),
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: FloatingActionButton.extended(
           backgroundColor: Colors.white,
-          label: Text('Pesquisar novo jogo',style: TextStyle(color: Colors.black),),
-          icon: Icon(Icons.search,color: Colors.black,),
-          onPressed: () {},
+          label: Container(
+            constraints: BoxConstraints(
+              maxWidth: 170,
+              maxHeight: 20,
+            ),
+            child: TextField(
+              controller: txtPartida,
+              decoration: InputDecoration(
+                labelText: 'Pesquisar nova partida',
+                border: InputBorder.none,
+                floatingLabelBehavior: FloatingLabelBehavior.never,
+              ),
+            ),
+          ),
+          icon: Icon(
+            Icons.search,
+            color: Colors.black,
+          ),
+          onPressed: () {
+            setState(() {
+              id = int.parse(txtPartida.text);
+            });
+          },
         ),
       ),
     );
