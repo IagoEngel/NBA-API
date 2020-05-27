@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:nba_api/buscar_partida.dart';
-import 'package:nba_api/classes/jogos.dart';
-import 'package:nba_api/jogos_controller.dart';
 
-int id = 299;
+int id = 1;
 
 void main() {
   runApp(NBA_API());
@@ -17,14 +15,6 @@ class NBA_API extends StatefulWidget {
 
 class _NBA_APIState extends State<NBA_API> {
   TextEditingController txtPartida = new TextEditingController();
-  AsyncSnapshot teste;
-  Future<Jogos> partida;
-
-  @override
-  void initState() {
-    super.initState();
-    partida = BuscarDados(id);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,18 +25,7 @@ class _NBA_APIState extends State<NBA_API> {
         body: SingleChildScrollView(
           child: ConstrainedBox(
             constraints: BoxConstraints(),
-            child: FutureBuilder<Jogos>(
-              future: partida,
-              builder: (context, snapshot) {
-                teste = snapshot;
-                if (snapshot.hasData) {
-                  return BuscarPartida(idPartida: teste.data.id);
-                } else if (snapshot.hasError) {
-                  return Text("${snapshot.error}");
-                }
-                return CircularProgressIndicator();
-              },
-            ),
+            child: BuscarPartida(idPartida: id),
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -71,9 +50,6 @@ class _NBA_APIState extends State<NBA_API> {
             color: Colors.black,
           ),
           onPressed: () {
-            setState(() {
-              id = int.parse(txtPartida.text);
-            });
           },
         ),
       ),
